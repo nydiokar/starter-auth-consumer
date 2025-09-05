@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Auth Consumer Test UI</title>
+    <style>
+      :root { --bg: #0f172a; --panel: #111827; --text: #e5e7eb; --muted: #94a3b8; --accent: #22d3ee; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu; background: var(--bg); color: var(--text); }
+      header { padding: 16px; border-bottom: 1px solid #1f2937; display:flex; align-items:center; justify-content:space-between; }
+      h1 { font-size: 18px; margin: 0; }
+      main { padding: 16px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start; }
+      .card { background: var(--panel); border: 1px solid #1f2937; border-radius: 8px; padding: 16px; }
+      .card h2 { font-size: 16px; margin: 0 0 12px; color: var(--accent); }
+      label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+      input { width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid #334155; background: #0b1220; color: var(--text); }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      button { padding: 8px 10px; border-radius: 6px; border: 1px solid #334155; background: #0b1220; color: var(--text); cursor: pointer; }
+      button.primary { background: #0ea5e9; border-color: #0ea5e9; color: #001219; font-weight: 600; }
+      button:hover { filter: brightness(1.1); }
+      .muted { color: var(--muted); font-size: 12px; }
+      pre { margin: 0; white-space: pre-wrap; word-break: break-word; background:#0b1220; border:1px solid #334155; border-radius:6px; padding:10px; max-height: 320px; overflow: auto; }
+      ul { margin: 0; padding-left: 18px; }
+      .status { display:flex; gap: 8px; align-items:center; }
+      .pill { padding: 2px 8px; font-size: 12px; border-radius: 999px; border: 1px solid #334155; background: #0b1220; }
+      .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Auth Consumer Test UI</h1>
+      <div class="status">
+        <span id="status" class="pill">Not checked</span>
+        <button id="btn-refresh">Refresh</button>
+      </div>
+    </header>
+    <main>
+      <section class="card">
+        <h2>Register</h2>
+        <div class="row">
+          <div>
+            <label>Email</label>
+            <input id="reg-email" type="email" placeholder="user@example.com" />
+          </div>
+          <div>
+            <label>Password</label>
+            <input id="reg-password" type="password" placeholder="Str0ngP@ssw0rd!" />
+          </div>
+        </div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="btn-register" class="primary">Register</button>
+          <button id="btn-login">Login</button>
+          <button id="btn-logout">Logout</button>
+          <button id="btn-me">Me</button>
+        </div>
+        <p class="muted" style="margin-top:8px;">Note: CSRF header is only required when a session cookie is present.</p>
+      </section>
+
+      <section class="card">
+        <h2>Email Verification</h2>
+        <div class="row">
+          <div>
+            <label>Email</label>
+            <input id="verify-email" type="email" placeholder="user@example.com" />
+          </div>
+          <div>
+            <label>Token</label>
+            <input id="verify-token" type="text" placeholder="Paste token from email" />
+          </div>
+        </div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="btn-request-verify">Request Verify</button>
+          <button id="btn-verify" class="primary">Verify</button>
+          <button id="btn-dev-latest-verify" title="Fetch latest captured verify token">Dev: Get Token</button>
+        </div>
+        <p class="muted" style="margin-top:8px;">In dev, capture token via your mail sink (e.g., MailHog) or server logs.</p>
+      </section>
+
+      <section class="card">
+        <h2>Password Reset</h2>
+        <div class="row">
+          <div>
+            <label>Email</label>
+            <input id="reset-email" type="email" placeholder="user@example.com" />
+          </div>
+          <div>
+            <label>New Password</label>
+            <input id="reset-password" type="password" placeholder="NewStr0ngP@ss!" />
+          </div>
+        </div>
+        <div style="margin-top:8px;">
+          <label>Reset Token</label>
+          <input id="reset-token" type="text" placeholder="Paste token from email" />
+        </div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="btn-request-reset">Request Reset</button>
+          <button id="btn-reset" class="primary">Reset Password</button>
+          <button id="btn-dev-latest-reset" title="Fetch latest captured reset token">Dev: Get Token</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Sessions</h2>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <button id="btn-sessions">List Sessions</button>
+        </div>
+        <div id="sessions"></div>
+      </section>
+
+      <section class="card">
+        <h2>RBAC / Admin</h2>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <button id="btn-admin-ping">GET /admin/ping</button>
+          <button id="btn-dev-promote-admin" title="Assign admin role to email">Dev: Promote Admin</button>
+        </div>
+        <p class="muted">Assign the <strong>admin</strong> role to your user in the DB to pass this check.</p>
+      </section>
+
+      <section class="card" style="grid-column: 1 / -1;">
+        <h2>Last Response</h2>
+        <pre id="out"></pre>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+  </html>

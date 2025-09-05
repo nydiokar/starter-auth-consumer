@@ -1,0 +1,26 @@
+@base=http://localhost:4000
+
+### Register
+POST {{base}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Str0ngP@ssw0rd!"
+}
+
+### Login
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Str0ngP@ssw0rd!"
+}
+
+### Me
+GET {{base}}/auth/me
+
+### Admin (requires admin role)
+GET {{base}}/admin/ping
+
