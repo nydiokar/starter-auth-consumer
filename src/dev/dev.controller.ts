@@ -1,5 +1,5 @@
 import { BadRequestException, Body, Controller, Get, Post, Query, Req } from '@nestjs/common';
-import { DevTokenStore } from './dev-token.store.js';
+import { addToken, listTokens, clearTokens } from './dev-store.js';
 import { PrismaService } from '../prisma.service.js';
 import { Inject } from '@nestjs/common';
 import { AUTH_CONFIG, AUTH_REDIS, SessionService } from '@lean-kit/auth';
@@ -14,7 +14,6 @@ function ensureDev() {
 @Controller('dev')
 export class DevController {
   constructor(
-    private readonly tokens: DevTokenStore,
     private readonly prisma: PrismaService,
     private readonly sessions: SessionService,
     @Inject(AUTH_CONFIG) private readonly cfg: any,
@@ -24,13 +23,13 @@ export class DevController {
   @Get('tokens')
   listTokens(@Query('email') email?: string) {
     ensureDev();
-    return { tokens: this.tokens.list(email) };
+    return { tokens: listTokens(email) };
   }
 
   @Post('tokens/clear')
   clearTokens(@Body('email') email?: string) {
     ensureDev();
-    this.tokens.clear(email);
+    clearTokens(email);
     return { ok: true };
   }
 

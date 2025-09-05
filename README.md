@@ -45,3 +45,10 @@ Dev tokens (no SMTP required)
   - `POST /dev/tokens/clear` with optional `{ email }` to clear
   - `POST /dev/promote-admin` with `{ email }` to grant admin role
 - UI buttons labeled “Dev: Get Token” will fetch and auto-fill the latest token for the given email.
+
+Dev tools (high‑leverage checks)
+- WhoAmI/session controls: view current session id + TTL, expire session, set short TTL.
+- Rate limits: run repeated wrong-password logins; clear rate-limit buckets.
+- Audit logs: list last 50 and clear quickly to see new events.
+- Config view: inspect effective cookie/CSRF config (dev safe subset).
+- Tokens panel: list/clear captured verify/reset tokens.

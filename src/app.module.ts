@@ -6,9 +6,8 @@ import { PrismaService } from './prisma.service.js';
 import { PrismaModule } from './prisma.module.js';
 import { env } from './env.js';
 import { AdminController } from './controllers/admin.controller.js';
-import { DevMailerService } from './dev/dev-mailer.service.js';
-import { DevTokenStore } from './dev/dev-token.store.js';
 import { DevController } from './dev/dev.controller.js';
+import { addToken } from './dev/dev-store.js';
 
 @Global()
 @Module({
@@ -24,14 +23,18 @@ import { DevController } from './dev/dev.controller.js';
       mailer: env.mailer,
       // Override mailer in dev to capture tokens
       ...(process.env.NODE_ENV === 'development' ? {
-        mailerProvider: { provide: AUTH_MAILER, useClass: DevMailerService }, // <- useClass, not useExisting
+        mailerProvider: { provide: AUTH_MAILER, useValue: {
+          async sendVerifyEmail(user: { email: string }, token: string) {
+            addToken({ type: 'verify', email: user.email, token, at: new Date().toISOString() });
+          },
+          async sendPasswordReset(user: { email: string }, token: string) {
+            addToken({ type: 'reset', email: user.email, token, at: new Date().toISOString() });
+          }
+        } },
       } : {}),
     }),
   ],
-  providers: [
-    DevTokenStore,    // <- Add this dependency
-    DevMailerService, // <- Add this provider
-  ],
+  providers: [],
   controllers: [AdminController, DevController],
   exports: [],
 })

@@ -37,6 +37,14 @@
     </header>
     <main>
       <section class="card">
+        <h2>Settings</h2>
+        <div style="display:flex; gap:12px; align-items:center; flex-wrap: wrap;">
+          <label><input id="set-cred" type="checkbox" checked /> Include credentials (cookies)</label>
+          <label><input id="set-csrf" type="checkbox" checked /> Send CSRF header on POST</label>
+        </div>
+      </section>
+
+      <section class="card">
         <h2>Register</h2>
         <div class="row">
           <div>
@@ -115,6 +123,53 @@
           <button id="btn-dev-promote-admin" title="Assign admin role to email">Dev: Promote Admin</button>
         </div>
         <p class="muted">Assign the <strong>admin</strong> role to your user in the DB to pass this check.</p>
+      </section>
+
+      <section class="card">
+        <h2>Dev Tools</h2>
+        <div style="display:flex; flex-wrap: wrap; gap:8px; margin-bottom:8px;">
+          <button id="btn-dev-whoami">Who Am I</button>
+          <button id="btn-dev-expire">Expire Current Session</button>
+          <button id="btn-dev-ttl5">Set TTL 5s</button>
+          <button id="btn-dev-rl-clear">Clear Rate Limits</button>
+          <button id="btn-dev-config">Show Config</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Audit Logs</h2>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <button id="btn-dev-audit-list">List Last 50</button>
+          <button id="btn-dev-audit-clear">Clear All</button>
+        </div>
+        <div id="audit"></div>
+      </section>
+
+      <section class="card">
+        <h2>Dev Tokens</h2>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <button id="btn-dev-tokens-list">List Tokens</button>
+          <button id="btn-dev-tokens-clear">Clear Tokens</button>
+        </div>
+        <div id="tokens"></div>
+      </section>
+
+      <section class="card">
+        <h2>Rate Limit Tester</h2>
+        <div class="row">
+          <div>
+            <label>Attempts</label>
+            <input id="rl-attempts" type="number" value="10" min="1" />
+          </div>
+          <div>
+            <label>Delay (ms)</label>
+            <input id="rl-delay" type="number" value="100" min="0" />
+          </div>
+        </div>
+        <div style="margin-top:8px; display:flex; gap:8px;">
+          <button id="btn-rl-wrong">Run Wrong-Password Attempts</button>
+        </div>
+        <div id="rl-out" class="muted" style="margin-top:8px;"></div>
       </section>
 
       <section class="card" style="grid-column: 1 / -1;">

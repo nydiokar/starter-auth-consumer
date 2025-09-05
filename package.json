@@ -9,7 +9,8 @@
     "start": "npm run build && node dist/main.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:seed": "tsx prisma/seed.ts"
+    "prisma:seed": "tsx prisma/seed.ts",
+    "smoke": "tsx scripts/smoke.ts"
   },
   "dependencies": {
     "@lean-kit/auth": "file:../../auth_module/package",
