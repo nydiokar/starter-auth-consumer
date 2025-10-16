@@ -5,12 +5,14 @@ Purpose
 
 Quick Start
 - Prereqs: Node 18+, Docker (for Redis), SQLite (file-based).
-- From repo root:
-  1) Build package: `cd auth_module/package && npm install && npm run build`
-  2) Install app deps: `cd ../../apps/auth-consumer && npm install`
-  3) Start Redis: `docker compose up -d` (or `docker compose -f docker-compose.yml up -d`)
-  4) Prisma: `npm run prisma:generate && npm run prisma:migrate && npm run prisma:seed`
-  5) Run app: `npm run dev` (or `npm run start` to build + run)
+- From this repo root:
+  1) Build auth package: `cd ../starter-kit-auth/package && npm install` (auto-builds via prepare hook)
+  2) Return to consumer: `cd ../../starter-auth-consumer`
+  3) Copy env: `cp .env.example .env` and adjust if needed
+  4) Install deps: `npm install`
+  5) Setup database: `npm run prisma:generate && npm run prisma:migrate && npm run prisma:seed`
+  6) Start Redis: `docker compose up -d` (requires Docker Desktop running)
+  7) Run app: `npm run dev`
 
 Env
 - Copy `.env.example` to `.env` and adjust as needed.
@@ -25,7 +27,7 @@ Endpoints
   - GET /admin/ping (requires role: admin)
 
 Testing manually
-- Use `../..//auth_module/examples/http/requests.http` (set base URL to http://localhost:4000).
+- Use `examples/requests.http` in this repo (already set to http://localhost:4000).
 - Include `x-csrf-token` on mutating requests when session cookie present (see docs).
 
 Frontend test UI

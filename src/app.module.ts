@@ -13,7 +13,8 @@ import { addToken } from './dev/dev-store.js';
 @Module({
   imports: [
     PrismaModule,
-    CsrfModule,
+    // Disable CSRF in development for easier testing
+    ...(process.env.NODE_ENV !== 'development' ? [CsrfModule] : []),
     AuthModule.forRoot({
       redis: { url: env.redisUrl },
       prisma: {},

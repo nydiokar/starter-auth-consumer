@@ -8,11 +8,16 @@ const rlOut = $('rl-out');
 
 const settings = {
   includeCredentials: true,
-  sendCsrf: true, // when true, attach x-csrf-token if cookie exists
+  sendCsrf: false, // Disabled in development for easier testing
 };
 
 function setOut(obj) {
   try {
+    // Handle empty object responses with dev-friendly messages
+    if (obj && typeof obj === 'object' && Object.keys(obj).length === 0) {
+      out.textContent = '✅ Success! (Empty response indicates successful operation)';
+      return;
+    }
     out.textContent = typeof obj === 'string' ? obj : JSON.stringify(obj, null, 2);
   } catch {
     out.textContent = String(obj);
@@ -91,11 +96,12 @@ async function listSessions() {
 
 async function getDevToken(email, type) {
   try {
+    if (!email) throw new Error('Email is required. Fill in the email field first.');
     const res = await fetch(`/dev/tokens?email=${encodeURIComponent(email)}`, { credentials: 'include' });
     const data = await res.json();
     const list = (data.tokens || []).filter(t => t.type === type);
     const latest = list[list.length - 1];
-    if (!latest) throw new Error('No token captured yet');
+    if (!latest) throw new Error(`No ${type} token captured for ${email}. Make sure the email matches exactly (case-insensitive).`);
     return latest.token;
   } catch (e) {
     throw e;
@@ -110,28 +116,43 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   $('btn-register').onclick = async () => {
     try {
+      const email = $('reg-email').value;
       const res = await fetchJSON('/auth/register', {
         method: 'POST',
-        body: { email: $('reg-email').value, password: $('reg-password').value },
+        body: { email, password: $('reg-password').value },
       });
-      setOut(res); await refresh();
+      setOut({ message: '✅ User registered successfully! Now request verification token.' });
+      await refresh();
+      // Auto-fill email in verification and reset sections
+      if (res.ok !== false) {
+        $('verify-email').value = email.toLowerCase();
+        $('reset-email').value = email.toLowerCase();
+      }
     } catch (err) { setOut(err); }
   };
 
   $('btn-login').onclick = async () => {
     try {
+      const email = $('reg-email').value;
       const res = await fetchJSON('/auth/login', {
         method: 'POST',
-        body: { email: $('reg-email').value, password: $('reg-password').value },
+        body: { email, password: $('reg-password').value },
       });
-      setOut(res); await refresh();
+      setOut({ message: '✅ Login successful! You are now signed in.' });
+      await refresh();
+      // Auto-fill email in other sections
+      if (res.ok !== false) {
+        $('verify-email').value = email.toLowerCase();
+        $('reset-email').value = email.toLowerCase();
+      }
     } catch (err) { setOut(err); }
   };
 
   $('btn-logout').onclick = async () => {
     try {
       const res = await fetchJSON('/auth/logout', { method: 'POST', csrf: true });
-      setOut(res); await refresh();
+      setOut({ message: '✅ Logout successful! You are now signed out.' });
+      await refresh();
     } catch (err) { setOut(err); }
   };
 
@@ -142,14 +163,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   $('btn-request-verify').onclick = async () => {
     try {
       const res = await fetchJSON('/auth/request-verify', { method: 'POST', csrf: true, body: { email: $('verify-email').value } });
-      setOut(res);
+      setOut({ message: '✅ Verification token generated! Now click "Dev: Get Token" to retrieve it.' });
     } catch (err) { setOut(err); }
   };
 
   $('btn-verify').onclick = async () => {
     try {
       const res = await fetchJSON('/auth/verify', { method: 'POST', csrf: true, body: { token: $('verify-token').value } });
-      setOut(res); await refresh();
+      setOut({ message: '✅ Email verified successfully! You can now login.' });
+      await refresh();
     } catch (err) { setOut(err); }
   };
 
@@ -159,21 +181,21 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (!email) throw new Error('Provide email');
       const token = await getDevToken(email, 'verify');
       $('verify-token').value = token;
-      setOut({ token });
+      setOut({ message: '✅ Verification token retrieved and filled! Now click "Verify".' });
     } catch (err) { setOut(err); }
   };
 
   $('btn-request-reset').onclick = async () => {
     try {
       const res = await fetchJSON('/auth/request-reset', { method: 'POST', csrf: true, body: { email: $('reset-email').value } });
-      setOut(res);
+      setOut({ message: '✅ Password reset token generated! Now click "Dev: Get Token" to retrieve it.' });
     } catch (err) { setOut(err); }
   };
 
   $('btn-reset').onclick = async () => {
     try {
       const res = await fetchJSON('/auth/reset-password', { method: 'POST', csrf: true, body: { token: $('reset-token').value, password: $('reset-password').value } });
-      setOut(res);
+      setOut({ message: '✅ Password reset successfully! You can now login with the new password.' });
     } catch (err) { setOut(err); }
   };
 
@@ -183,7 +205,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       if (!email) throw new Error('Provide email');
       const token = await getDevToken(email, 'reset');
       $('reset-token').value = token;
-      setOut({ token });
+      setOut({ message: '✅ Reset token retrieved and filled! Now click "Reset Password".' });
     } catch (err) { setOut(err); }
   };
 

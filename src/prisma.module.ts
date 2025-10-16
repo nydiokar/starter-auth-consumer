@@ -21,7 +21,7 @@ import { AUTH_PRISMA } from '@lean-kit/auth';
       inject: [PrismaService],
     }
   ],
-  exports: [PrismaService, { provide: AUTH_PRISMA, useExisting: PrismaService }],
+  exports: [PrismaService, AUTH_PRISMA],
 })
 export class PrismaModule {}
 
